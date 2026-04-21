@@ -42,5 +42,15 @@ jobs:
           memory: '1024Mb'
           execution-timeout: '3s'
           include: |
-            .
+            *.py
             requirements.txt
+            utils/
+            config/
+          exclude: |
+            .git/
+            .github/
+            __pycache__/
+            *.pyc
+            .env
+            .vscode/
+            .idea/
