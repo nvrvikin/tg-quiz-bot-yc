@@ -24,12 +24,13 @@ jobs:
         id: get-iam-token
         uses: docker://ghcr.io/yc-actions/yc-iam-token-fed:1.0.0
         with:
-          yc-sa-id: ${{ secrets.YC_SERVICE_ACCOUNT_ID }}   # ID сервисного аккаунта
+          yc-sa-id: ${{ secrets.YC_SERVICE_ACCOUNT_ID }}   # ID сервисного аккаунта 
+          yc-oidc-provider-id: ${{ secrets.YC_OIDC_PROVIDER_ID }} # ID федерации
 
       - name: Deploy function
         uses: yc-actions/yc-sls-function@v2
         with:
-          yc-iam-token: ${{ steps.get-iam-token.outputs.token }}
+          yc-iam-token: ${{ steps.get-iam-token.outputs.token }} 
           yc-folder-id: ${{ secrets.YC_FOLDER_ID }}
           function-name: ${{ secrets.YC_FUNCTION_NAME }}
           runtime: 'python311'
