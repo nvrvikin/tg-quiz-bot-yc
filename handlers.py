@@ -86,7 +86,7 @@ async def cmd_questions(message: types.Message):
 async def cmd_start(message: types.Message):
     builder = ReplyKeyboardBuilder()
     builder.add(types.KeyboardButton(text="Начать игру"))
-    await message.answer("Д0бр0 п0жаловать в квиз!", reply_markup=builder.as_markup(resize_keyboard=True))
+    await message.answer("Д0бр0 п0жаловатььь в квиз!", reply_markup=builder.as_markup(resize_keyboard=True))
 
 
 # Хэндлер на команду /quiz
