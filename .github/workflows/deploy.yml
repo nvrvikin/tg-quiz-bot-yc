@@ -3,7 +3,6 @@ name: Deploy to Yandex Cloud Function
 on:
     push:
         branches: [ main ]   # при пуше в ветку main
-        workflow_dispatch
 
 # 3. Список задач (jobs), которые выполняются параллельно или последовательно
 jobs:
