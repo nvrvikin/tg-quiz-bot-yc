@@ -36,15 +36,15 @@ jobs:
           yc-oidc-provider-id: ${{ secrets.YC_OIDC_PROVIDER_ID }} # ID федерации
 
       - name: Deploy function
-        uses: yc-actions/yc-sls-function@v2
+        uses: yc-actions/yc-sls-function@v4          # Важно: используйте v4 или новее
         with:
-          yc-iam-token: ${{ steps.get-iam-token.outputs.token }} 
+          yc-sa-id: ${{ secrets.YC_SERVICE_ACCOUNT_ID }}
           yc-folder-id: ${{ secrets.YC_FOLDER_ID }}
           function-name: ${{ secrets.YC_FUNCTION_NAME }}
-          runtime: 'python311'
-          entrypoint: 'index.handler'
-          memory: '128Mb'
-          execution-timeout: '10s'
+          runtime: 'python312'                       # Укажите ваш runtime
+          entrypoint: 'tb_webhook.webhook'                
+          memory: '1024Mb'
+          execution-timeout: '3s'
           include: |
             .
             requirements.txt
