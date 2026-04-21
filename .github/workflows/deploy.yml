@@ -4,21 +4,17 @@ on:
     push:
         branches: [ main ]   # при пуше в ветку main
 
-# 3. Список задач (jobs), которые выполняются параллельно или последовательно
 jobs:
-  # Название задачи (можете придумать своё)
   deploy:
-    # На какой операционной системе запускать (ubuntu, windows, macos)
     runs-on: ubuntu-latest
     
-    # Права, которые нужны задаче (для OIDC нужно id-token: write)
     permissions:
-      id-token: write   # чтобы получить временный токен от GitHub
+      id-token: write
       contents: read
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4   # готовое действие от GitHub
+        uses: actions/checkout@v4
 
       - name: Debug OIDC Token
         run: |
@@ -32,16 +28,16 @@ jobs:
         id: get-iam-token
         uses: docker://ghcr.io/yc-actions/yc-iam-token-fed:1.0.0
         with:
-          yc-sa-id: ${{ secrets.YC_SERVICE_ACCOUNT_ID }}   # ID сервисного аккаунта 
+          yc-sa-id: ${{ secrets.YC_SERVICE_ACCOUNT_ID }} # ID сервисного аккаунта 
           yc-oidc-provider-id: ${{ secrets.YC_OIDC_PROVIDER_ID }} # ID федерации
 
       - name: Deploy function
-        uses: yc-actions/yc-sls-function@v4          # Важно: используйте v4 или новее
+        uses: yc-actions/yc-sls-function@v4
         with:
           yc-sa-id: ${{ secrets.YC_SERVICE_ACCOUNT_ID }}
-          yc-folder-id: ${{ secrets.YC_FOLDER_ID }}
+          folder-id: ${{ secrets.YC_FOLDER_ID }}
           function-name: ${{ secrets.YC_FUNCTION_NAME }}
-          runtime: 'python312'                       # Укажите ваш runtime
+          runtime: 'python312'
           entrypoint: 'tb_webhook.webhook'                
           memory: '1024Mb'
           execution-timeout: '3s'
