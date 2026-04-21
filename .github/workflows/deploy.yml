@@ -1,0 +1,42 @@
+name: Deploy to Yandex Cloud Function
+
+on:
+    push:
+        branches: [ main ]   # при пуше в ветку main
+        workflow_dispatch
+
+# 3. Список задач (jobs), которые выполняются параллельно или последовательно
+jobs:
+  # Название задачи (можете придумать своё)
+  deploy:
+    # На какой операционной системе запускать (ubuntu, windows, macos)
+    runs-on: ubuntu-latest
+    
+    # Права, которые нужны задаче (для OIDC нужно id-token: write)
+    permissions:
+      id-token: write   # чтобы получить временный токен от GitHub
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4   # готовое действие от GitHub
+
+      - name: Get IAM token via OIDC federation
+        id: get-iam-token
+        uses: docker://ghcr.io/yc-actions/yc-iam-token-fed:1.0.0
+        with:
+          yc-sa-id: ${{ secrets.YC_SERVICE_ACCOUNT_ID }}   # ID сервисного аккаунта
+
+      - name: Deploy function
+        uses: yc-actions/yc-sls-function@v2
+        with:
+          yc-iam-token: ${{ steps.get-iam-token.outputs.token }}
+          yc-folder-id: ${{ secrets.YC_FOLDER_ID }}
+          function-name: ${{ secrets.YC_FUNCTION_NAME }}
+          runtime: 'python311'
+          entrypoint: 'index.handler'
+          memory: '128Mb'
+          execution-timeout: '10s'
+          include: |
+            .
+            requirements.txt
