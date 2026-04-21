@@ -20,6 +20,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4   # готовое действие от GitHub
 
+      - name: Debug OIDC Token
+        run: |
+            TOKEN=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL")
+            echo "Полный токен: $TOKEN"
+            echo "$TOKEN" | jq -r '.value' | cut -d'.' -f2 | base64 -d | jq '.aud'
+
+
       - name: Get IAM token via OIDC federation
         id: get-iam-token
         uses: docker://ghcr.io/yc-actions/yc-iam-token-fed:1.0.0
