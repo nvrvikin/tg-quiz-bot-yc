@@ -44,6 +44,8 @@ jobs:
           service-account-id: ${{ secrets.YC_SERVICE_ACCOUNT_ID }}
           environment: |
             API_TOKEN=${{ secrets.API_TOKEN }}
+            YDB_ENDPOINT=${{ secrets.YDB_ENDPOINT }}
+            YDB_DATABASE=${{ secrets.YDB_DATABASE }}
           include: |
             .
             requirements.txt
