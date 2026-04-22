@@ -41,7 +41,7 @@ jobs:
           entrypoint: 'tb_webhook.webhook'                
           memory: '1024Mb'
           execution-timeout: '3s'
-          service-account-id: ${{ secrets.YC_SERVICE_ACCOUNT_ID }}
+          service-account: ${{ secrets.YC_SERVICE_ACCOUNT_ID }}
           environment: |
             API_TOKEN=${{ secrets.API_TOKEN }}
             YDB_ENDPOINT=${{ secrets.YDB_ENDPOINT }}
