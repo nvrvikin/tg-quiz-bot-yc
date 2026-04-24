@@ -16,6 +16,38 @@ def generate_options_keyboard(answer_options, right_answer):
     builder.adjust(1)
     return builder.as_markup()
 
+async def get_results(user_id):
+    get_results_query = f"""
+        DECLARE $user_id AS Uint64;
+
+        SELECT *
+        FROM `quiz_results`
+        WHERE user_id == $user_id;
+    """
+    results = execute_select_query(pool, get_results_query, user_id=user_id)
+    return results
+
+async def get_top_results():
+    get_top_results_query = f"""
+        SELECT user_id, nickname, score
+        FROM `users`
+        JOIN `quiz_results` ON `users`.user_id = `quiz_results`.user_id
+        ORDER BY score DESC
+        LIMIT 10;
+    """
+    results = execute_select_query(pool, get_top_results_query)
+    return results
+
+async def update_quiz_results(user_id, score):
+    update_quiz_results_query = f"""
+        DECLARE $user_id AS Uint64;
+        DECLARE $score AS Uint64;
+
+        UPSERT INTO `quiz_results` (`user_id`, `score`)
+        VALUES ($user_id, $score);
+    """
+    execute_update_query(pool, update_quiz_results_query, user_id=user_id, score=score)
+
 async def get_user_nickname(user_id):
     get_user_nickname_query = f"""
         DECLARE $user_id AS Uint64;
