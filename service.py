@@ -21,7 +21,7 @@ async def get_results(user_id):
         DECLARE $user_id AS Uint64;
 
         SELECT *
-        FROM `quiz_results`
+        FROM `users`
         WHERE user_id == $user_id;
     """
     results = execute_select_query(pool, get_results_query, user_id=user_id)
@@ -29,24 +29,23 @@ async def get_results(user_id):
 
 async def get_top_results():
     get_top_results_query = f"""
-        SELECT user_id, nickname, score
+        SELECT user_id, nickname, user_points
         FROM `users`
-        JOIN `quiz_results` ON `users`.user_id = `quiz_results`.user_id
-        ORDER BY score DESC
+        ORDER BY user_points DESC
         LIMIT 10;
     """
     results = execute_select_query(pool, get_top_results_query)
     return results
 
-async def update_quiz_results(user_id, score):
+async def update_quiz_results(user_id, user_points):
     update_quiz_results_query = f"""
         DECLARE $user_id AS Uint64;
-        DECLARE $score AS Uint64;
+        DECLARE $user_points AS Uint64;
 
-        UPSERT INTO `quiz_results` (`user_id`, `score`)
-        VALUES ($user_id, $score);
+        UPSERT INTO `users` (`user_id`, `user_points`)
+        VALUES ($user_id, $user_points);
     """
-    execute_update_query(pool, update_quiz_results_query, user_id=user_id, score=score)
+    execute_update_query(pool, update_quiz_results_query, user_id=user_id, user_points=user_points)
 
 async def get_user_nickname(user_id):
     get_user_nickname_query = f"""
@@ -114,7 +113,7 @@ async def get_quiz_index(user_id):
         DECLARE $user_id AS Uint64;
 
         SELECT question_index
-        FROM `quiz_state`
+        FROM `users`
         WHERE user_id == $user_id;
     """
     results = execute_select_query(pool, get_user_index, user_id=user_id)
@@ -130,7 +129,7 @@ async def update_quiz_index(user_id, question_index):
         DECLARE $user_id AS Uint64;
         DECLARE $question_index AS Uint64;
 
-        UPSERT INTO `quiz_state` (`user_id`, `question_index`)
+        UPSERT INTO `users` (`user_id`, `question_index`)
         VALUES ($user_id, $question_index);
     """
 
