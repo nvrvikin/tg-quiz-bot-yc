@@ -78,7 +78,7 @@ async def get_question(message, user_id):
     # Получение текущего вопроса из словаря состояний пользователя
     current_question_index = await get_quiz_index(user_id)
     print(current_question_index)
-    questions = get_questions()
+    questions = await get_questions()
     if not len(questions):
         await message.answer('Нет вопросов')
         return
