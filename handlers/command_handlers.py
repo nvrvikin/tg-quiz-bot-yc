@@ -28,4 +28,4 @@ async def cmd_quiz(message: types.Message, state: FSMContext):
     #if not await check_nickname(message, user_id, state):
     #    return
     
-    await new_quiz(message, user_id)
+    await new_quiz(message)
