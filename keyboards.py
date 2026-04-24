@@ -1,7 +1,7 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import types
 
-from data.callbacks import CB_CANCEL, CB_CORRECT_ANSWER, CB_RESULTS_MENU, CB_RESULTS_TOP, CB_WRONG_ANSWER, CB_START_QUIZ, CB_CHANGE_NICKNAME
+from data.callbacks import CB_CANCEL, CB_RESULTS_MENU, CB_RESULTS_TOP, CB_START_QUIZ, CB_CHANGE_NICKNAME
 
 # Клавиатура с вариантами ответа на вопрос
 def generate_options_keyboard(answer_options):
