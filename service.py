@@ -105,7 +105,7 @@ async def get_quiz_index(user_id: int):
         FROM `users`
         WHERE user_id == $user_id;
     """
-    results = await execute_select_query(pool, get_user_index, user_id=user_id)
+    results = execute_select_query(pool, get_user_index, user_id=user_id)
 
     if len(results) == 0:
         return 0
@@ -134,7 +134,7 @@ async def get_questions():
         SELECT *
         FROM `questions`
     """
-    results = await execute_select_query(
+    results = execute_select_query(
         pool,
         get_questions_query
     )
