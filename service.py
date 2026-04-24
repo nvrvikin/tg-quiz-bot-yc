@@ -64,7 +64,7 @@ async def update_user_nickname(user_id, nickname):
     execute_update_query(pool, update_user_nickname_query, user_id=user_id, nickname=nickname)
 
 async def get_question(message: types.Message, user_id):
-    await message.answer_chat_action(types.ChatActions.TYPING)
+    await message.bot.send_chat_action(message.chat.id, action='typing')
     # Получение текущего вопроса из словаря состояний пользователя
     current_question_index = await get_quiz_index(user_id)
     print(current_question_index)
@@ -85,7 +85,7 @@ async def get_question(message: types.Message, user_id):
         return
 
     if current_question['has_question_image']:
-        await message.answer_chat_action(types.ChatActions.UPLOAD_PHOTO)
+        await message.bot.send_chat_action(message.chat.id, action='upload_photo')
         await message.answer_photo(current_question['question_image_link'])
 
     kb = generate_options_keyboard(json.loads(current_question['options']))
