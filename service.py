@@ -1,6 +1,6 @@
 import json
 
-from  database import pool, execute_update_query, execute_select_query
+from database import pool, execute_update_query, execute_select_query
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 from aiogram import types
 
@@ -16,8 +16,31 @@ def generate_options_keyboard(answer_options, right_answer):
     builder.adjust(1)
     return builder.as_markup()
 
+async def get_user_nickname(user_id):
+    get_user_nickname_query = f"""
+        DECLARE $user_id AS Uint64;
+
+        SELECT nickname
+        FROM `users`
+        WHERE user_id == $user_id;
+    """
+    results = execute_select_query(pool, get_user_nickname_query, user_id=user_id)
+
+    if len(results) == 0:
+        return None
+
+    return results[0]["nickname"]
+
 async def update_user_nickname(user_id, nickname):
-    pass
+    update_user_nickname_query = f"""
+        DECLARE $user_id AS Uint64;
+        DECLARE $nickname AS String;
+
+        UPDATE `users`
+        SET nickname = $nickname
+        WHERE user_id == $user_id;
+    """
+    execute_update_query(pool, update_user_nickname_query, user_id=user_id, nickname=nickname)
 
 async def get_question(message, user_id):
     # Получение текущего вопроса из словаря состояний пользователя
