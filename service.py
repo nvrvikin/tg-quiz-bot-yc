@@ -86,7 +86,7 @@ async def get_question(message, user_id):
         return
     
     kb = generate_options_keyboard(json.loads(current_question['options']))
-    await message.answer(f'{current_question["question_text"].decode("utf-8")}', reply_markup=kb)
+    await message.answer(f'{current_question["question_text"].decode("utf-8")}', parse_mode='HTML', reply_markup=kb)
 
 
 async def new_quiz(message):
