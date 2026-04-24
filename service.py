@@ -64,6 +64,7 @@ async def update_user_nickname(user_id, nickname):
     execute_update_query(pool, update_user_nickname_query, user_id=user_id, nickname=nickname)
 
 async def get_question(message, user_id):
+    message.send_chat_action(types.ChatActions.TYPING)
     # Получение текущего вопроса из словаря состояний пользователя
     current_question_index = await get_quiz_index(user_id)
     print(current_question_index)
@@ -71,7 +72,7 @@ async def get_question(message, user_id):
     if not len(questions):
         await message.answer('Нет вопросов')
         return
-    
+        
     is_q_found = False
     q_text = ''
     q_options = []
@@ -84,7 +85,13 @@ async def get_question(message, user_id):
     if not is_q_found:
         await message.answer('Вопрос не найден')
         return
-    
+
+    if current_question['has_question_image']:
+        message.send_chat_action(types.ChatActions.UPLOAD_PHOTO)
+        await message.answer_photo(current_question['question_image_link'])
+    message.send_chat_action(types.ChatActions.SEND_PHOTO)
+
+
     kb = generate_options_keyboard(json.loads(current_question['options']))
     await message.answer(f'{current_question["question_text"].decode("utf-8")}', parse_mode='HTML', reply_markup=kb)
 
