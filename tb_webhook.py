@@ -1,18 +1,22 @@
 import os
 import logging
 from aiogram import Bot, Dispatcher, types
-import handlers
+#import handlers
+from handlers import command_router, callback_router, message_router
 
 import json
 
-# Включаем логирование, чтобы не пропустить важные сообщения 
 logging.basicConfig(level=logging.INFO)
 
 API_TOKEN = os.getenv("API_TOKEN")
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
-dp.include_router(handlers.router)
+dp.include_routers(
+    command_router,
+    callback_router,
+    message_router
+)
 
 async def process_event(event):
 
