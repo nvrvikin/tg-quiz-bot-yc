@@ -4,13 +4,13 @@ from aiogram import types
 from data.callbacks import CB_CANCEL, CB_CORRECT_ANSWER, CB_RESULTS_MENU, CB_RESULTS_TOP, CB_WRONG_ANSWER, CB_START_QUIZ, CB_CHANGE_NICKNAME
 
 # Клавиатура с вариантами ответа на вопрос
-def generate_options_keyboard(answer_options, right_answer):
+def generate_options_keyboard(answer_options):
     builder = InlineKeyboardBuilder()
 
-    for i in range(len(answer_options)):
+    for key, value in answer_options.items():
         builder.add(types.InlineKeyboardButton(
-            text = answer_options[i],
-            callback_data = f'{i}')
+            text = value,
+            callback_data = f'{key}')
         )
 
     builder.adjust(1)

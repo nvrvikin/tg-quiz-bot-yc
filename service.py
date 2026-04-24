@@ -4,17 +4,7 @@ from database import pool, execute_update_query, execute_select_query
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 from aiogram import types
 
-def generate_options_keyboard(answer_options, right_answer):
-    builder = InlineKeyboardBuilder()
-
-    for option in answer_options:
-        builder.add(types.InlineKeyboardButton(
-            text=option,
-            callback_data="right_answer" if option == right_answer else "wrong_answer")
-        )
-
-    builder.adjust(1)
-    return builder.as_markup()
+from keyboards import generate_options_keyboard
 
 async def get_results(user_id):
     get_results_query = f"""
@@ -85,20 +75,18 @@ async def get_question(message, user_id):
     is_q_found = False
     q_text = ''
     q_options = []
+    current_question = None
     for q in questions:
         if q['order_index'] == current_question_index:
             is_q_found = True
-            q_text = q['question_text'].decode('utf-8')
-            q_options = json.loads(q['options'])
+            current_question = q
 
     if not is_q_found:
         await message.answer('Вопрос не найден')
         return
-    await message.answer(f'{q_text}')
-    for key, value in q_options.items():
-        await message.answer(f'{key}::: {value}')
-    #kb = generate_options_keyboard(opts, opts[correct_option])
-    #await message.answer(f"{quiz_data[current_question_index]['question']}", reply_markup=kb)
+    
+    kb = generate_options_keyboard(json.loads(current_question['options']))
+    await message.answer(f'{current_question["question_text"].decode("utf-8")}', reply_markup=kb)
 
 
 async def new_quiz(message):
