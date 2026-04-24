@@ -2,9 +2,9 @@ from aiogram import F, Router, types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
-from .common_functions import check_nickname, main_menu_state, get_question, new_quiz
+from .common_functions import check_nickname, main_menu_state
 from data.callbacks import CB_CANCEL, CB_CORRECT_ANSWER, CB_RESULTS_MENU, CB_RESULTS_TOP, CB_START_QUIZ, CB_WRONG_ANSWER
-from service import get_quiz_index, get_resluts, get_top_results, get_user_nickname, update_quiz_index, update_quiz_results
+from service import get_question, get_quiz_index, get_resluts, get_top_results, get_user_nickname, new_quiz, update_quiz_index, update_quiz_results
 from generate_answer import generate_correct_answer, generate_wrong_answer
 
 from data.questions import quiz_data

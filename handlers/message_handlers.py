@@ -2,7 +2,7 @@ from aiogram import Router, types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
-from handlers.common_functions import main_menu_state
+from .common_functions import main_menu_state
 from service import update_user_nickname
 from generate_answer import generate_unhandled_message_answer
 from states.state import UserForm
