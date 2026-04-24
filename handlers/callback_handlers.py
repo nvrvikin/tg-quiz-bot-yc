@@ -30,7 +30,7 @@ async def resluts_menu_state(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(UserForm.results_menu)
     kb = generate_results_menu_keyboard()
     user_id = callback.from_user.id
-    message = await get_resluts(user_id)
+    message = await get_results(user_id)
     nickname = await get_user_nickname(user_id)
     await callback.message.answer(f'<b>Меню результатов</b>\n{ nickname }{ message }', reply_markup=kb, parse_mode='HTML')
 
@@ -90,7 +90,7 @@ async def handle_quiz_answer(callback: types.CallbackQuery, state: FSMContext):
     if current_question_index < len(quiz_data):
         await get_question(callback.message, user_id)
     else:
-        results = await get_resluts(user_id)
+        results = await get_results(user_id)
         await end_quiz(callback, state, results)
 
 
