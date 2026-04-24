@@ -13,7 +13,7 @@ async def get_results(user_id: int):
         FROM `users`
         WHERE user_id == $user_id;
     """
-    results = await execute_select_query(pool, get_results_query, user_id=user_id)
+    results = execute_select_query(pool, get_results_query, user_id=user_id)
     return results
 
 async def get_top_results():
@@ -23,7 +23,7 @@ async def get_top_results():
         ORDER BY user_points DESC
         LIMIT 10;
     """
-    results = await execute_select_query(pool, get_top_results_query)
+    results = execute_select_query(pool, get_top_results_query)
     return results
 
 async def update_quiz_results(user_id: int, user_points: int):
@@ -34,7 +34,7 @@ async def update_quiz_results(user_id: int, user_points: int):
         UPSERT INTO `users` (`user_id`, `user_points`)
         VALUES ($user_id, $user_points);
     """
-    await execute_update_query(pool, update_quiz_results_query, user_id=user_id, user_points=user_points)
+    execute_update_query(pool, update_quiz_results_query, user_id=user_id, user_points=user_points)
 
 async def get_user_nickname(user_id: int):
     get_user_nickname_query = f"""
@@ -44,7 +44,7 @@ async def get_user_nickname(user_id: int):
         FROM `users`
         WHERE user_id == $user_id;
     """
-    results = await execute_select_query(pool, get_user_nickname_query, user_id=user_id)
+    results = execute_select_query(pool, get_user_nickname_query, user_id=user_id)
 
     if len(results) == 0:
         return None
@@ -60,7 +60,7 @@ async def update_user_nickname(user_id: int, nickname: str):
         SET nickname = $nickname
         WHERE user_id == $user_id;
     """
-    await execute_update_query(pool, update_user_nickname_query, user_id=user_id, nickname=nickname)
+    execute_update_query(pool, update_user_nickname_query, user_id=user_id, nickname=nickname)
 
 async def get_question(message: types.Message, user_id: int):
     # Получение текущего вопроса из словаря состояний пользователя
@@ -122,7 +122,7 @@ async def update_quiz_index(user_id: int, question_index: int):
         VALUES ($user_id, $question_index);
     """
 
-    await execute_update_query(
+    execute_update_query(
         pool,
         set_quiz_state,
         user_id=user_id,
