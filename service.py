@@ -74,8 +74,6 @@ async def get_question(message, user_id):
         return
         
     is_q_found = False
-    q_text = ''
-    q_options = []
     current_question = None
     for q in questions:
         if q['order_index'] == current_question_index:
@@ -87,10 +85,8 @@ async def get_question(message, user_id):
         return
 
     if current_question['has_question_image']:
-        message.send_chat_action(types.ChatActions.UPLOAD_PHOTO)
+        await message.send_chat_action(types.ChatActions.UPLOAD_PHOTO)
         await message.answer_photo(current_question['question_image_link'])
-    message.send_chat_action(types.ChatActions.SEND_PHOTO)
-
 
     kb = generate_options_keyboard(json.loads(current_question['options']))
     await message.answer(f'{current_question["question_text"].decode("utf-8")}', parse_mode='HTML', reply_markup=kb)
