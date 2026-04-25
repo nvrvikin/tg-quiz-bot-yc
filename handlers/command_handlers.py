@@ -13,6 +13,7 @@ router = Router()
 # ОБРАБОТКА /start
 @router.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
+    await message.bot.send_chat_action(message.chat.id, action='typing')
     await message.answer(PHRASE_GREET)
     user_id = message.from_user.id
 

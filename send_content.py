@@ -1,19 +1,29 @@
 from aiogram import types
+from aiogram.types import BufferedInputFile
 import aiohttp
 
-async def send_video_note(message: types.Message, video_url: str):
+async def send_video_note(message: types.Message, video_url: str, duration: int = 49, length: int = 600):
+    """
+    Sends a video note (circle video) to the user.
+
+    Args:
+        message (types.Message): The message object to reply to.
+        video_url (str): The URL of the video to send.
+        duration (int, optional): Duration of the video note in seconds. Defaults to 49.
+        length (int, optional): Diameter of the video note in pixels. Defaults to 600.
+    """
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(video_url) as resp:
                 if resp.status == 200:
                     # Читаем всё содержимое в память
                     video_data = await resp.read()
-                    file = types.BufferedInputFile(video_data, filename="circle.mp4")
+                    file = BufferedInputFile(video_data, filename="circle.mp4")
                     
                     sent = await message.answer_video_note(
                         video_note=file,
-                        duration=49,
-                        length=600
+                        duration=duration,
+                        length=length
                     )
                     
                     file_id = sent.video_note.file_id
@@ -21,6 +31,7 @@ async def send_video_note(message: types.Message, video_url: str):
                 else:
                     await message.answer("Не удалось загрузить видео")
     except Exception as e:
+        await message.answer(f"Ошибка: {e}")
         await message.answer(f"Ошибка: {e}")
 
 async def send_voice(message: types.Message, voice_url: str):

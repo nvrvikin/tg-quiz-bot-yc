@@ -4,6 +4,7 @@ from database import pool, execute_update_query, execute_select_query
 from aiogram import types
 
 from keyboards import generate_options_keyboard
+from send_content import send_video_note
 
 async def get_results(user_id: int):
     get_results_query = f"""
@@ -86,9 +87,50 @@ async def get_question(message: types.Message, user_id: int):
         await message.bot.send_chat_action(message.chat.id, action='upload_photo')
         await message.answer_photo(current_question['question_image_link'])
 
+    if current_question['has_question_video']:
+        await message.bot.send_chat_action(message.chat.id, action='upload_video')
+        await send_video_note(message, current_question['question_video_link'], current_question['question_video_duration'], current_question['question_video_length'])
+
+    if current_question['has_question_voice']:
+        await message.bot.send_chat_action(message.chat.id, action='upload_voice')
+        await message.answer_voice(current_question['question_voice_link'])
+
     kb = generate_options_keyboard(json.loads(current_question['options']))
     await message.answer(f'{current_question["question_text"].decode("utf-8")}', parse_mode='HTML', reply_markup=kb)
 
+async def check_question_answer(callback: types.CallbackQuery, user_id: int):
+    current_question_index = await get_quiz_index(user_id)
+    questions = await get_questions()
+    if not len(questions):
+        return False
+        
+    is_q_found = False
+    current_question = None
+    for q in questions:
+        if q['order_index'] == current_question_index:
+            is_q_found = True
+            current_question = q
+
+    if not is_q_found:
+        return False
+
+    correct_option_index = current_question['correct_option']
+    user_answer_index = int(callback.data)
+
+    if current_question['has_answer_image']:
+        await callback.bot.send_chat_action(callback.from_user.id, action='upload_photo')
+        await callback.message.answer_photo(current_question['answer_image_link'])
+    
+    if  current_question['has_answer_video']:
+        await callback.bot.send_chat_action(callback.from_user.id, action='upload_video')
+        await send_video_note(callback.message, current_question['answer_video_link'], current_question['answer_video_duration'], current_question['answer_video_length'])
+
+    if current_question['has_answer_voice']:
+        await callback.bot.send_chat_action(callback.from_user.id, action='upload_voice')
+        await callback.message.answer_voice(current_question['answer_voice_link'])
+
+    if user_answer_index == correct_option_index:
+        callback.message.reply_markup = None
 
 async def new_quiz(message: types.Message):
     user_id = message.from_user.id

@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 
 from .common_functions import check_nickname, main_menu_state
 from data.callbacks import CB_CANCEL, CB_RESULTS_MENU, CB_RESULTS_TOP, CB_START_QUIZ
-from service import get_question, get_quiz_index, get_results, get_top_results, get_user_nickname, new_quiz, update_quiz_index, update_quiz_results
+from service import check_question_answer, get_question, get_quiz_index, get_results, get_top_results, get_user_nickname, new_quiz, update_quiz_index, update_quiz_results
 from generate_answer import generate_correct_answer, generate_wrong_answer
 
 from data.questions import quiz_data
@@ -68,6 +68,7 @@ async def handle_quiz_answer(callback: types.CallbackQuery, state: FSMContext):
     result_answer = ''
 
     current_question_index = await get_quiz_index(user_id)
+    await check_question_answer(callback, user_id)
     question = quiz_data[current_question_index]
     user_answer_index = int(callback.data)
     is_corrent = user_answer_index == question['correct_option']
