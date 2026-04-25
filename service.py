@@ -153,7 +153,7 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
     result_answer = ''
     if user_answer_index == correct_option_index:
         result_answer = generate_correct_answer(current_question['options'][user_answer_index])
-        await add_quiz_results(user_id, user_points=1)
+        await add_quiz_results(user_id, 1)
     else:
         result_answer = generate_wrong_answer(current_question['options'][user_answer_index])
 
