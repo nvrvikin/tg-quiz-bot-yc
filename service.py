@@ -5,7 +5,6 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 
 from generate_answer import generate_correct_answer, generate_wrong_answer
-from handlers.quiz_functions import end_quiz
 from keyboards import generate_options_keyboard
 from send_content import send_video_note
 
@@ -100,8 +99,8 @@ async def get_question(message: types.Message, user_id: int, state: FSMContext):
     if not is_q_found:
         user = await get_user(user_id)
         results = f"Ваш результат: { user[0]['user_points'] if user[0]['user_points'] is not None else 0 } очков."
-        await end_quiz(message, user_id, state, results)
-        return
+        await message.answer(f"Это был последний вопрос. Квиз завершен! { results }", parse_mode="HTML")
+        return False
 
     if current_question['has_question_image']:
         await message.bot.send_chat_action(message.chat.id, action='upload_photo')
@@ -117,6 +116,8 @@ async def get_question(message: types.Message, user_id: int, state: FSMContext):
 
     kb = generate_options_keyboard(json.loads(current_question['options']))
     await message.answer(f'{current_question["question_text"].decode("utf-8")}', parse_mode='HTML', reply_markup=kb)
+
+    return True
 
 async def check_question_answer(callback: types.CallbackQuery, user_id: int):
     current_question_index = await get_quiz_index(user_id)

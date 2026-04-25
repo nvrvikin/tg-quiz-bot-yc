@@ -66,7 +66,10 @@ async def handle_quiz_answer(callback: types.CallbackQuery, state: FSMContext):
         return
     await check_question_answer(callback, user_id)
     #await callback.message.answer(result_answer, parse_mode="HTML")
-    await get_question(callback.message, user_id, state)
+    has_question = await get_question(callback.message, user_id, state)
+    if not has_question:
+        # End quiz
+        await main_menu_state(message=callback.message, user_id=user_id, state=state)
 
 
 async def cancel(callback: types.CallbackQuery, state: FSMContext):
