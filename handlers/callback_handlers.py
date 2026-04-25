@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 
 from .common_functions import check_nickname, main_menu_state
 from data.callbacks import CB_CANCEL, CB_RESULTS_MENU, CB_RESULTS_TOP, CB_START_QUIZ
-from service import check_question_answer, get_question, get_quiz_index, get_results, get_top_results, get_user_nickname, new_quiz, update_quiz_index, update_quiz_results
+from service import check_question_answer, get_question, get_quiz_index, get_user, get_top_results, get_user_nickname, new_quiz, update_quiz_index, update_quiz_results
 from generate_answer import generate_correct_answer, generate_wrong_answer
 
 from keyboards import generate_change_nickname_keyboard, generate_results_menu_keyboard, generate_results_top_keyboard
@@ -31,7 +31,7 @@ async def resluts_menu_state(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(UserForm.results_menu)
     kb = generate_results_menu_keyboard()
     user_id = callback.from_user.id
-    message = await get_results(user_id)
+    message = await get_user(user_id)
     nickname = await get_user_nickname(user_id)
     await callback.message.answer(f'<b>Меню результатов</b>\n{ nickname }{ message }', reply_markup=kb, parse_mode='HTML')
 
