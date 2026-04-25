@@ -80,7 +80,7 @@ async def update_user_nickname(user_id: int, nickname: str):
     """
     execute_update_query(pool, update_user_nickname_query, user_id=user_id, nickname=nickname)
 
-async def get_question(message: types.Message, user_id: int, state: FSMContext):
+async def get_question(message: types.Message, user_id: int):
     # Получение текущего вопроса из словаря состояний пользователя
     current_question_index = await get_quiz_index(user_id)
     print(current_question_index)
