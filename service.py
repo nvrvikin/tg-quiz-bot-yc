@@ -5,7 +5,7 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 
 from generate_answer import generate_correct_answer, generate_wrong_answer
-from handlers.common_functions import end_quiz
+from handlers.quiz_functions import end_quiz
 from keyboards import generate_options_keyboard
 from send_content import send_video_note
 
@@ -98,8 +98,9 @@ async def get_question(message: types.Message, user_id: int, state: FSMContext):
             current_question = q
 
     if not is_q_found:
+        user = await get_user(user_id)
+        results = f"Ваш результат: { user[0]['user_points'] if user[0]['user_points'] is not None else 0 } очков."
         await end_quiz(message, user_id, state, results)
-        await message.answer('Вопрос не найден')
         return
 
     if current_question['has_question_image']:
@@ -157,7 +158,7 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
 
     current_question_index += 1
     await update_quiz_index(user_id, current_question_index)
-    
+
     callback.answer(result_answer, parse_mode='HTML')
 
 async def new_quiz(message: types.Message):

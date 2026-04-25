@@ -7,12 +7,13 @@ from data.callbacks import CB_CANCEL, CB_RESULTS_MENU, CB_RESULTS_TOP, CB_START_
 from service import check_question_answer, get_question, get_quiz_index, get_results, get_top_results, get_user_nickname, new_quiz, update_quiz_index, update_quiz_results
 from generate_answer import generate_correct_answer, generate_wrong_answer
 
-from data.questions import quiz_data
 from keyboards import generate_change_nickname_keyboard, generate_results_menu_keyboard, generate_results_top_keyboard
 
 from states.state import UserForm
 
 router = Router()
+
+
 
 # STATE TRANSITIONS
 async def change_nickname_state(message: types.Message, user_id: int, state: FSMContext):
@@ -57,7 +58,7 @@ async def change_question_text(callback: types.CallbackQuery):
 
 async def handle_quiz_answer(callback: types.CallbackQuery, state: FSMContext):
     await clear_markup(callback)
-    
+
     user_id = callback.from_user.id
 
     # Проверка наличия никнейма
