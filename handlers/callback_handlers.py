@@ -56,48 +56,17 @@ async def change_question_text(callback: types.CallbackQuery):
     )
 
 async def handle_quiz_answer(callback: types.CallbackQuery, state: FSMContext):
-    user_id = callback.from_user.id
-        
-    # Очистка клавиатуры
     await clear_markup(callback)
+    
+    user_id = callback.from_user.id
 
     # Проверка наличия никнейма
     if not await check_nickname(message=callback.message, user_id=user_id, state=state):
         return
-
-    result_answer = ''
-
-    current_question_index = await get_quiz_index(user_id)
     await check_question_answer(callback, user_id)
-    question = quiz_data[current_question_index]
-    user_answer_index = int(callback.data)
-    is_corrent = user_answer_index == question['correct_option']
-    print(f'callback.data: { callback.data }, user_answer_index: { user_answer_index }, is_correct: { is_corrent }')
+    #await callback.message.answer(result_answer, parse_mode="HTML")
+    await get_question(callback.message, user_id, state)
 
-    if is_corrent:
-        result_answer = generate_correct_answer(question['options'][user_answer_index])
-        # 1 для верных
-        await update_quiz_results(user_id, current_question_index, 1)
-    else:
-        result_answer = generate_wrong_answer(question['options'][user_answer_index])
-        # 0 для неверных
-        await update_quiz_results(user_id, current_question_index, 0)
-
-    await callback.message.answer(result_answer, parse_mode="HTML")
-
-    current_question_index += 1
-    await update_quiz_index(user_id, current_question_index)
-
-    if current_question_index < len(quiz_data):
-        await get_question(callback.message, user_id)
-    else:
-        results = await get_results(user_id)
-        await end_quiz(callback, state, results)
-
-
-async def end_quiz(callback: types.CallbackQuery, state: FSMContext, results: str):
-    await callback.message.answer(f"Это был последний вопрос. Квиз завершен! { results }", parse_mode="HTML")
-    await main_menu_state(message=callback.message, user_id=callback.from_user.id, state=state)
 
 async def cancel(callback: types.CallbackQuery, state: FSMContext):
     await main_menu_state(message=callback.message, user_id=callback.from_user.id, state=state)

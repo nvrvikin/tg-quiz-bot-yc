@@ -2,19 +2,22 @@ import json
 
 from database import pool, execute_update_query, execute_select_query
 from aiogram import types
+from aiogram.fsm.context import FSMContext
 
+from generate_answer import generate_correct_answer, generate_wrong_answer
+from handlers.common_functions import end_quiz
 from keyboards import generate_options_keyboard
 from send_content import send_video_note
 
-async def get_results(user_id: int):
-    get_results_query = f"""
+async def get_user(user_id: int):
+    get_user_query = f"""
         DECLARE $user_id AS Uint64;
 
         SELECT *
         FROM `users`
         WHERE user_id == $user_id;
     """
-    results = execute_select_query(pool, get_results_query, user_id=user_id)
+    results = execute_select_query(pool, get_user_query, user_id=user_id)
     return results
 
 async def get_top_results():
@@ -26,6 +29,21 @@ async def get_top_results():
     """
     results = execute_select_query(pool, get_top_results_query)
     return results
+
+async def add_quiz_results(user_id: int, user_points: int):
+    user = await get_user(user_id)
+    if len(user) == 0:
+        return
+    current_points = user[0]['user_points'] if user[0]['user_points'] is not None else 0
+    new_points = current_points + user_points
+    update_quiz_results_query = f"""
+        DECLARE $user_id AS Uint64;
+        DECLARE $user_points AS Uint64;
+
+        UPSERT INTO `users` (`user_id`, `user_points`)
+        VALUES ($user_id, $user_points);
+    """
+    execute_update_query(pool, update_quiz_results_query, user_id=user_id, user_points=new_points)
 
 async def update_quiz_results(user_id: int, user_points: int):
     update_quiz_results_query = f"""
@@ -63,7 +81,7 @@ async def update_user_nickname(user_id: int, nickname: str):
     """
     execute_update_query(pool, update_user_nickname_query, user_id=user_id, nickname=nickname)
 
-async def get_question(message: types.Message, user_id: int):
+async def get_question(message: types.Message, user_id: int, state: FSMContext):
     # Получение текущего вопроса из словаря состояний пользователя
     current_question_index = await get_quiz_index(user_id)
     print(current_question_index)
@@ -80,6 +98,7 @@ async def get_question(message: types.Message, user_id: int):
             current_question = q
 
     if not is_q_found:
+        await end_quiz(message, user_id, state, results)
         await message.answer('Вопрос не найден')
         return
 
@@ -129,8 +148,17 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
         await callback.bot.send_chat_action(callback.from_user.id, action='upload_voice')
         await callback.message.answer_voice(current_question['answer_voice_link'])
 
+    result_answer = ''
     if user_answer_index == correct_option_index:
-        callback.message.reply_markup = None
+        result_answer = generate_correct_answer(current_question['options'][user_answer_index])
+        await add_quiz_results(user_id, user_points=1)
+    else:
+        result_answer = generate_wrong_answer(current_question['options'][user_answer_index])
+
+    current_question_index += 1
+    await update_quiz_index(user_id, current_question_index)
+    
+    callback.answer(result_answer, parse_mode='HTML')
 
 async def new_quiz(message: types.Message):
     user_id = message.from_user.id
