@@ -143,7 +143,7 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
     print(f"User answer index: {callback.data}")
     print(f"INT User answer index: {int(callback.data)}")
     print(f"Correct answer index: {current_question['correct_option']}")
-    correct_option_index = current_question['correct_option'] + 1
+    correct_option_index = current_question['correct_option']
     user_answer_index = int(callback.data)
 
     if current_question['has_answer_image']:
