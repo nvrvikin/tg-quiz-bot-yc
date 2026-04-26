@@ -138,6 +138,9 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
     if not is_q_found:
         return False
 
+    print(f"User answer index: {callback.data}")
+    print(f"INT User answer index: {int(callback.data)}")
+    print(f"Correct answer index: {current_question['correct_option']}")
     correct_option_index = current_question['correct_option']
     user_answer_index = int(callback.data)
 
@@ -158,6 +161,7 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
         result_answer = generate_correct_answer(current_question['options'][user_answer_index])
         await add_quiz_results(user_id, 1)
     else:
+        print(f"User answer index: {user_answer_index}")
         result_answer = generate_wrong_answer(current_question['options'][user_answer_index])
 
     current_question_index += 1
