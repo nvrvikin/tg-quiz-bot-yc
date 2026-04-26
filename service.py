@@ -125,23 +125,25 @@ async def get_question(message: types.Message, user_id: int):
 async def check_question_answer(callback: types.CallbackQuery, user_id: int):
     current_question_index = await get_quiz_index(user_id)
     questions = await get_questions()
+    print(f"Current question index: {current_question_index}")
+    print(f"Questions count: { len(questions) }")
     if not len(questions):
         return False
-        
+    print(f"Questions: { questions }")
+
     is_q_found = False
     current_question = None
     for q in questions:
         if q['order_index'] == current_question_index:
             is_q_found = True
             current_question = q
-
+    print(f"Current question: { current_question }")
     if not is_q_found:
         return False
-
     print(f"User answer index: {callback.data}")
     print(f"INT User answer index: {int(callback.data)}")
     print(f"Correct answer index: {current_question['correct_option']}")
-    correct_option_index = current_question['correct_option']
+    correct_option_index = current_question['correct_option'] + 1
     user_answer_index = int(callback.data)
 
     if current_question['has_answer_image']:
