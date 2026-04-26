@@ -2,7 +2,6 @@ import json
 
 from database import pool, execute_update_query, execute_select_query
 from aiogram import types
-from aiogram.fsm.context import FSMContext
 
 from generate_answer import generate_correct_answer, generate_wrong_answer
 from keyboards import generate_options_keyboard
@@ -31,8 +30,12 @@ async def get_top_results():
 
 async def add_quiz_results(user_id: int, user_points: int):
     user = await get_user(user_id)
-    if len(user) == 0:
+    if not user or len(user) == 0:
+        print(f"User not found: {user_id}")
+        print(f"Adding new user with points: {user_points}")
+        print(f"Got user: {user}")
         return
+    print(f"Current user points: {user[0]['user_points']}")
     current_points = user[0]['user_points'] if user[0]['user_points'] is not None else 0
     new_points = current_points + user_points
     update_quiz_results_query = f"""
@@ -160,7 +163,7 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
     current_question_index += 1
     await update_quiz_index(user_id, current_question_index)
 
-    callback.answer(result_answer, parse_mode='HTML')
+    await callback.message.answer(result_answer, parse_mode='HTML')
 
 async def new_quiz(message: types.Message):
     user_id = message.from_user.id
