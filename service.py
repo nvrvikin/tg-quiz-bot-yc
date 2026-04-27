@@ -132,11 +132,7 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
     print(f"Questions: { questions }")
 
     is_q_found = False
-    current_question = None
-    for q in questions:
-        if q['order_index'] == current_question_index:
-            is_q_found = True
-            current_question = q
+    current_question = questions[current_question_index]
     print(f"Current question: { current_question }")
     if not is_q_found:
         return False
@@ -173,7 +169,7 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
 
 async def new_quiz(message: types.Message):
     user_id = message.from_user.id
-    current_question_index = 1
+    current_question_index = 0
     await update_quiz_index(user_id, current_question_index)
     await get_question(message, user_id)
 
