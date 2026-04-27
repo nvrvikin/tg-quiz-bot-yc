@@ -90,20 +90,15 @@ async def get_question(message: types.Message, user_id: int):
     questions = await get_questions()
     if not len(questions):
         await message.answer('Нет вопросов')
-        return
-        
-    is_q_found = False
-    current_question = None
-    for q in questions:
-        if q['order_index'] == current_question_index:
-            is_q_found = True
-            current_question = q
+        return False
 
-    if not is_q_found:
+    if len(questions) <= current_question_index:
         user = await get_user(user_id)
         results = f"Ваш результат: { user[0]['user_points'] if user[0]['user_points'] is not None else 0 } очков."
         await message.answer(f"Это был последний вопрос. Квиз завершен! { results }", parse_mode="HTML")
         return False
+
+    current_question = questions[current_question_index]
 
     if current_question['has_question_image']:
         await message.bot.send_chat_action(message.chat.id, action='upload_photo')
