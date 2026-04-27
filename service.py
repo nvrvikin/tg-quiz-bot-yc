@@ -214,6 +214,8 @@ async def get_questions():
     get_questions_query = f"""
         SELECT *
         FROM `questions`
+        WHERE is_active = TRUE
+        ORDER BY order_index ASC
     """
     results = execute_select_query(
         pool,
