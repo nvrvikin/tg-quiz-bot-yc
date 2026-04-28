@@ -1,5 +1,7 @@
 import json
 
+from aiogram.exceptions import TelegramBadRequest
+
 from database import pool, execute_update_query, execute_select_query
 from aiogram import types
 
@@ -105,8 +107,9 @@ async def get_question(message: types.Message, user_id: int):
         await message.answer_photo(current_question['question_image_link'])
 
     if current_question['has_question_video']:
+        print(f"Отправляем видео. Ссылка: {current_question['question_video_link']}")
         await message.bot.send_chat_action(message.chat.id, action='upload_video')
-        await send_video_note(message, current_question['question_video_link'].decode('utf-8'), current_question['question_video_duration'], current_question['question_video_length'])
+        await send_video_note(message, current_question['question_video_link'], current_question['question_video_duration'], current_question['question_video_length'])
 
     if current_question['has_question_voice']:
         await message.bot.send_chat_action(message.chat.id, action='upload_voice')
@@ -159,19 +162,23 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
         print(f"User answer index: {user_answer_index}")
         result_answer = generate_wrong_answer(current_question['options'][user_answer_index])
 
-    
-
     current_question_index += 1
     await update_quiz_index(user_id, current_question_index)
     
-    await callback.bot.edit_message_text(
-        chat_id=callback.from_user.id,
-        message_id=callback.message.message_id,
-        text=f'{callback.message.text}\n\nОтвет:', 
-        reply_markup=None
-    )
+    try:
+        await callback.bot.edit_message_text(
+            chat_id=callback.from_user.id,
+            message_id=callback.message.message_id,
+            text=f'{callback.message.text}\n\n{result_answer}', 
+            reply_markup=None
+        )
+    except TelegramBadRequest as e:
+        if "message is not modified" in str(e):
+            pass
+    else:
+        raise
 
-    await callback.message.answer(result_answer, parse_mode='HTML')
+    return True
 
 async def new_quiz(message: types.Message, user_id: int):
     current_question_index = 0
