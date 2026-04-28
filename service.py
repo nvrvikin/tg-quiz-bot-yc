@@ -138,27 +138,28 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
     correct_option_index = current_question['correct_option']
     user_answer_index = int(callback.data)
 
-    if current_question['has_answer_image']:
-        await callback.bot.send_chat_action(callback.from_user.id, action='upload_photo')
-        await callback.message.answer_photo(current_question['answer_image_link'])
-    
-    if  current_question['has_answer_video']:
-        await callback.bot.send_chat_action(callback.from_user.id, action='upload_video')
-        await send_video_note(callback.message, current_question['answer_video_link'], current_question['answer_video_duration'], current_question['answer_video_length'])
-
-    if current_question['has_answer_voice']:
-        await callback.bot.send_chat_action(callback.from_user.id, action='upload_voice')
-        await callback.message.answer_voice(current_question['answer_voice_link'])
-
     result_answer = ''
     if user_answer_index == correct_option_index:
         result_answer = generate_correct_answer(current_question['options'][user_answer_index])
         await add_quiz_results(user_id, 1)
+        # Image
+        if current_question['has_answer_image']:
+            await callback.bot.send_chat_action(callback.from_user.id, action='upload_photo')
+            await callback.message.answer_photo(current_question['answer_image_link'])
+        # Video note
+        if  current_question['has_answer_video']:
+            await callback.bot.send_chat_action(callback.from_user.id, action='upload_video')
+            await send_video_note(callback.message, current_question['answer_video_link'], current_question['answer_video_duration'], current_question['answer_video_length'])
+        # Voice message        
+        if current_question['has_answer_voice']:
+            await callback.bot.send_chat_action(callback.from_user.id, action='upload_voice')
+            await callback.message.answer_voice(current_question['answer_voice_link'])
     else:
         print(f"User answer index: {user_answer_index}")
         result_answer = generate_wrong_answer(current_question['options'][user_answer_index])
 
-    print('UPDATING QUIZ INDEX HERE')
+    
+
     current_question_index += 1
     await update_quiz_index(user_id, current_question_index)
     
@@ -208,7 +209,14 @@ async def update_quiz_index(user_id: int, question_index: int):
         user_id=user_id,
         question_index=question_index,
     )
-    
+
+def decode_question(row):
+    """Превращает байтовые поля вопроса в обычные строки"""
+    for key, value in row.items():
+        if isinstance(value, bytes):
+            row[key] = value.decode('utf-8')
+    return row    
+
 async def get_questions():
     get_questions_query = f"""
         SELECT *
@@ -221,7 +229,7 @@ async def get_questions():
         get_questions_query
     )
 
-    if len(results) == 0:
-        return 0
-
-    return results
+    if not results:
+        return []
+    
+    return [decode_question(row) for row in results]
