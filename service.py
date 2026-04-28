@@ -106,7 +106,7 @@ async def get_question(message: types.Message, user_id: int):
 
     if current_question['has_question_video']:
         await message.bot.send_chat_action(message.chat.id, action='upload_video')
-        await send_video_note(message, current_question['question_video_link'], current_question['question_video_duration'], current_question['question_video_length'])
+        await send_video_note(message, current_question['question_video_link'].decode('utf-8'), current_question['question_video_duration'], current_question['question_video_length'])
 
     if current_question['has_question_voice']:
         await message.bot.send_chat_action(message.chat.id, action='upload_voice')

@@ -31,8 +31,9 @@ async def send_video_note(message: types.Message, video_url: str, duration: int 
                 else:
                     await message.answer("Не удалось загрузить видео")
     except Exception as e:
+        print(f"Ошибка при отправке видео: {e}")
         await message.answer(f"Ошибка: {e}")
-        await message.answer(f"Ошибка: {e}")
+
 
 async def send_voice(message: types.Message, voice_url: str):
     sent_message = await message.answer_voice(
