@@ -57,7 +57,7 @@ async def change_question_text(callback: types.CallbackQuery):
     )
 
 async def handle_quiz_answer(callback: types.CallbackQuery, state: FSMContext):
-    await clear_markup(callback)
+    #await clear_markup(callback)
 
     user_id = callback.from_user.id
 

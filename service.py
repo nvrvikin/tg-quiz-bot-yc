@@ -159,6 +159,13 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
 
     current_question_index += 1
     await update_quiz_index(user_id, current_question_index)
+    
+    await callback.bot.edit_message_text(
+        chat_id=callback.from_user.id,
+        message_id=callback.message.message_id,
+        text=f'{callback.message.text}\n\nОтвет:', 
+        reply_markup=None
+    )
 
     await callback.message.answer(result_answer, parse_mode='HTML')
 
