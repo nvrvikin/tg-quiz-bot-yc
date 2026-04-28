@@ -24,8 +24,9 @@ async def cmd_start(message: types.Message, state: FSMContext):
 
 @router.message(Command("quiz"))
 async def cmd_quiz(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
     await message.bot.send_chat_action(message.chat.id, action='typing')
     #if not await check_nickname(message, user_id, state):
     #    return
     
-    await new_quiz(message)
+    await new_quiz(message, user_id)

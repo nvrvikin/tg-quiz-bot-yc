@@ -25,7 +25,7 @@ async def change_nickname_state(message: types.Message, user_id: int, state: FSM
 async def quiz_state(message: types.Message, user_id: int, state: FSMContext):
     await state.set_state(UserForm.quiz)
     await message.answer(f"Начинаем квиз!")
-    await new_quiz(message)
+    await new_quiz(message, user_id)
 
 async def resluts_menu_state(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(UserForm.results_menu)

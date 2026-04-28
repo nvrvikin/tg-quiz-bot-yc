@@ -158,6 +158,7 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
         print(f"User answer index: {user_answer_index}")
         result_answer = generate_wrong_answer(current_question['options'][user_answer_index])
 
+    print('UPDATING QUIZ INDEX HERE')
     current_question_index += 1
     await update_quiz_index(user_id, current_question_index)
     
@@ -170,8 +171,7 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
 
     await callback.message.answer(result_answer, parse_mode='HTML')
 
-async def new_quiz(message: types.Message):
-    user_id = message.from_user.id
+async def new_quiz(message: types.Message, user_id: int):
     current_question_index = 0
     await update_quiz_index(user_id, current_question_index)
     await get_question(message, user_id)
