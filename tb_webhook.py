@@ -1,7 +1,6 @@
 import os
 import logging
 from aiogram import Bot, Dispatcher, types
-#import handlers
 from handlers import command_router, callback_router, message_router
 
 import json

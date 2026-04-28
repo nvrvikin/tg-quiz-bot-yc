@@ -126,11 +126,12 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
         return False
     print(f"Questions: { questions }")
 
-    is_q_found = False
+    if len(questions) <= current_question_index:
+        print(f"No more questions. Current question index: {current_question_index}, questions count: { len(questions) }")
+        return False
+    
     current_question = questions[current_question_index]
     print(f"Current question: { current_question }")
-    if not is_q_found:
-        return False
     print(f"User answer index: {callback.data}")
     print(f"INT User answer index: {int(callback.data)}")
     print(f"Correct answer index: {current_question['correct_option']}")
