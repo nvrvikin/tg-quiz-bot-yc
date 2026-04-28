@@ -176,6 +176,7 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
 async def new_quiz(message: types.Message, user_id: int):
     current_question_index = 0
     await update_quiz_index(user_id, current_question_index)
+    await update_quiz_results(user_id, 0)
     await get_question(message, user_id)
 
 
