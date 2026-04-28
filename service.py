@@ -140,7 +140,8 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
 
     result_answer = ''
     if user_answer_index == correct_option_index:
-        result_answer = generate_correct_answer(current_question['options'][str(user_answer_index)])
+        options = json.loads(current_question['options'])
+        result_answer = generate_correct_answer(options[str(user_answer_index)])
         await add_quiz_results(user_id, 1)
         # Image
         if current_question['has_answer_image']:
