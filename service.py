@@ -175,8 +175,8 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
     except TelegramBadRequest as e:
         if "message is not modified" in str(e):
             pass
-    else:
-        raise
+        else:
+            raise
 
     return True
 
