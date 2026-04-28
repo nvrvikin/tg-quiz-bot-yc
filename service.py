@@ -70,7 +70,7 @@ async def get_user_nickname(user_id: int):
     if len(results) == 0:
         return None
 
-    return results[0]["nickname"]
+    return results[0]["nickname"].decode('utf-8') if results[0]["nickname"] is not None else None
 
 async def update_user_nickname(user_id: int, nickname: str):
     update_user_nickname_query = f"""
@@ -113,7 +113,7 @@ async def get_question(message: types.Message, user_id: int):
         await message.answer_voice(current_question['question_voice_link'])
 
     kb = generate_options_keyboard(json.loads(current_question['options']))
-    await message.answer(f'{current_question["question_text"].decode("utf-8")}', parse_mode='HTML', reply_markup=kb)
+    await message.answer(f'{current_question["question_text"]}', parse_mode='HTML', reply_markup=kb)
 
     return True
 
