@@ -163,7 +163,7 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
             await callback.message.answer_voice(current_question['answer_voice_link'])
     else:
         print(f"User answer index: {user_answer_index}")
-        result_answer = generate_wrong_answer(current_question['options'][user_answer_index])
+        result_answer = generate_wrong_answer(options[str(user_answer_index)])
 
     current_question_index += 1
     await update_quiz_index(user_id, current_question_index)

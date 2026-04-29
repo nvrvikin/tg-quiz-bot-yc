@@ -9,7 +9,7 @@ def generate_options_keyboard(answer_options):
 
     for key, value in answer_options.items():
         builder.add(types.InlineKeyboardButton(
-            text = value,
+            text = f'{key}. {value}',
             callback_data = f'{key}')
         )
 
