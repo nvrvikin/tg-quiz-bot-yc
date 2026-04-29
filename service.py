@@ -116,7 +116,10 @@ async def get_question(message: types.Message, user_id: int):
         await message.answer_voice(current_question['question_voice_link'])
 
     kb = generate_options_keyboard(json.loads(current_question['options']))
-    await message.answer(f'{current_question["question_text"]}', parse_mode='HTML', reply_markup=kb)
+    text_message = f'<b>{current_question['order_index']}. {current_question["question_text"]}</b>'
+    if current_question['question_description']:
+        text_message += f'\n\n<i>{current_question['question_description']}</i>'
+    await message.answer(text_message, parse_mode='HTML', reply_markup=kb)
 
     return True
 
@@ -169,8 +172,9 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
         await callback.bot.edit_message_text(
             chat_id=callback.from_user.id,
             message_id=callback.message.message_id,
-            text=f'{callback.message.text}\n\n{result_answer}', 
-            reply_markup=None
+            text=f'<b>{current_question["question_text"]}</b>\n\n{result_answer}', 
+            reply_markup=None,
+            parse_mode='HTML'
         )
     except TelegramBadRequest as e:
         if "message is not modified" in str(e):
