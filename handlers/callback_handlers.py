@@ -126,7 +126,7 @@ async def results_menu(callback: types.CallbackQuery):
         await callback.answer(MSG_BUTTON_NOT_ACTIVE, show_alert=True)
         return
     await clear_markup(callback)
-    await resluts_menu_state(callback, state)
+    await resluts_menu_state(callback)
 
 @router.callback_query(F.data == CB_CHANGE_NICKNAME)
 async def change_nickname(callback: types.CallbackQuery):
