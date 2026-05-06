@@ -1,3 +1,4 @@
+import json
 from random import randint
 from aiogram import types
 from data.constants import CORRECT_PHRASES, UNHANDLED_MESSAGES_PHRASES, WRONG_PHRASES, PRE_WRONG_PHRASE, EMOJI_CORRECT, EMOJI_WRONG
@@ -38,27 +39,19 @@ def generate_results_list(results):
         response += f'{ digit } - { EMOJI_CORRECT if r[2] > 0 else EMOJI_WRONG }\n'
     return response
 
-async def generate_top_results_list(results, get_user_nickname):
+async def generate_top_results_list(results):
     if not len(results):
         return 'Нет топа. Похоже, ещё никто не прошёл квиз.'
     
-    user_scores = {}
-
-    for r in results:
-        if r[0] not in user_scores:
-            user_scores[r[0]] = r[2]
-        else:
-            user_scores[r[0]] += r[2]
-            pass
+    filtered_results = [r for r in results if r['nickname'] and r['user_points'] is not None]
     
-    sorted_users = sorted(user_scores.items(), key=lambda x: x[1], reverse=True)
+    sorted_results = sorted(filtered_results, key=lambda x: x['user_points'], reverse=True)
 
     results_list = ''
 
-    for u in sorted_users:
-        nickname = await get_user_nickname(u[0])
-        if nickname:
-            results_list += f'<i>{ nickname }</i>: { u[1] }\n'
+    for u in sorted_results:
+        if u["nickname"]:
+            results_list += f'<i>{ u["nickname"] }</i>: { u["user_points"] }\n'
 
     response = '<b>Топ результатов:</b>\n\n'
     return f'{response}{results_list}'

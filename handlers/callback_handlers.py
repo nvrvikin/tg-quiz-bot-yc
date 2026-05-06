@@ -1,7 +1,8 @@
 from aiogram import F, Router, types
 from aiogram.exceptions import TelegramBadRequest
-from data.callbacks import CB_CANCEL, CB_RESULTS_MENU, CB_RESULTS_TOP, CB_START_QUIZ
+from data.callbacks import CB_CANCEL, CB_CHANGE_NICKNAME, CB_RESULTS_MENU, CB_RESULTS_TOP, CB_START_QUIZ
 from data.constants import MSG_BUTTON_NOT_ACTIVE, MSG_NOT_IN_QUIZ
+from generate_answer import generate_top_results_list
 from handlers.common_functions import check_nickname, main_menu_state
 from service import (
     get_user_state, set_user_state, clear_user_state,
@@ -39,15 +40,19 @@ async def resluts_menu_state(callback: types.CallbackQuery):
 async def resluts_top_state(callback: types.CallbackQuery):
     await set_user_state(callback.from_user.id, state.RESULTS_TOP)
     kb = generate_results_top_keyboard()
-    message = await get_top_results()
+    results = await get_top_results()
+    message = await generate_top_results_list(results, get_user_nickname)
     await callback.message.answer(f'{ message }', reply_markup=kb, parse_mode='HTML')
 
 async def clear_markup(callback: types.CallbackQuery):
-    await callback.bot.edit_message_reply_markup(
-        chat_id=callback.from_user.id,
-        message_id=callback.message.message_id,
-        reply_markup=None
-    )
+    try:
+        await callback.bot.edit_message_reply_markup(
+            chat_id=callback.from_user.id,
+            message_id=callback.message.message_id,
+            reply_markup=None
+        )
+    except TelegramBadRequest:
+        pass
 
 async def change_question_text(callback: types.CallbackQuery):
     await callback.bot.edit_message_text(
@@ -103,6 +108,7 @@ async def cmd_quiz(callback: types.CallbackQuery):
         return
     
     await quiz_state(message=callback.message, user_id=user_id)
+
 # ОБРАБОТКА ОТВЕТОВ НА ВОПРОСЫ КВИЗА
 @router.callback_query(F.data.in_(['0', '1', '2', '3', '4']))
 async def quiz_answer(callback: types.CallbackQuery):
@@ -121,6 +127,15 @@ async def results_menu(callback: types.CallbackQuery):
         return
     await clear_markup(callback)
     await resluts_menu_state(callback, state)
+
+@router.callback_query(F.data == CB_CHANGE_NICKNAME)
+async def change_nickname(callback: types.CallbackQuery):
+    current_state = await get_user_state(callback.from_user.id)
+    if not current_state == state.MAIN_MENU:
+        await callback.answer(MSG_BUTTON_NOT_ACTIVE, show_alert=True)
+        return
+    await clear_markup(callback)
+    await change_nickname_state(callback)
 
 # Кнопка топа результатов
 @router.callback_query(F.data == CB_RESULTS_TOP)

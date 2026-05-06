@@ -58,7 +58,8 @@ async def get_top_results():
         LIMIT 10;
     """
     results = execute_select_query(pool, get_top_results_query)
-    return results
+
+    return [decode_row(row) for row in results]
 
 async def add_quiz_results(user_id: int, user_points: int):
     user = await get_user(user_id)
