@@ -12,21 +12,12 @@ router = Router()
 
 # ОБРАБОТКА /start
 @router.message(Command("start"))
-async def cmd_start(message: types.Message, state: FSMContext):
+async def cmd_start(message: types.Message):
     await message.bot.send_chat_action(message.chat.id, action='typing')
-    await message.answer(PHRASE_GREET)
+    await message.answer_photo('https://storage.yandexcloud.net/souls-bucket/cover/ds_quiz_cover.png', caption=PHRASE_GREET, parse_mode='HTML')
     user_id = message.from_user.id
 
-    if not await check_nickname(message, user_id, state):
+    if not await check_nickname(message, user_id):
         return
     
-    await main_menu_state(message, user_id, state)
-
-@router.message(Command("quiz"))
-async def cmd_quiz(message: types.Message, state: FSMContext):
-    user_id = message.from_user.id
-    await message.bot.send_chat_action(message.chat.id, action='typing')
-    #if not await check_nickname(message, user_id, state):
-    #    return
-    
-    await new_quiz(message, user_id)
+    await main_menu_state(message, user_id)

@@ -1,4 +1,4 @@
 from .callbacks import *
-from .constatns import *
+from .constants import *
 from .phrases import *
 from .questions import *

@@ -1,13 +1,43 @@
 import json
-
-from aiogram.exceptions import TelegramBadRequest
-
-from database import pool, execute_update_query, execute_select_query
+from typing import Optional, List, Dict, Any
 from aiogram import types
-
+from aiogram.exceptions import TelegramBadRequest
+from database import pool, execute_select_query, execute_update_query
 from generate_answer import generate_correct_answer, generate_wrong_answer
 from keyboards import generate_options_keyboard
 from send_content import send_video_note
+from data.constants import (
+    MSG_NO_QUESTIONS, MSG_QUIZ_FINISHED, MSG_NOT_IN_QUIZ, MSG_ERROR_OPTIONS
+)
+
+def decode_row(row: Dict[str, Any]) -> Dict[str, Any]:
+    for key, value in row.items():
+        if isinstance(value, bytes):
+            row[key] = value.decode('utf-8')
+    return row
+
+# USER STATE
+async def set_user_state(user_id: int, state: Optional[str]) -> None:
+    state_value = f"'{state}'" if state else "NULL"
+    query = f"""
+        DECLARE $user_id AS Uint64;
+        DECLARE $state AS Utf8;
+        UPSERT INTO `users` (`user_id`, `state`) VALUES ($user_id, $state);
+    """
+    execute_update_query(pool, query, user_id=user_id, state=state_value.strip("'"))
+
+async def get_user_state(user_id: int) -> Optional[str]:
+    query = f"""
+        DECLARE $user_id AS Uint64;
+        SELECT `state` FROM `users` WHERE user_id == $user_id;
+    """
+    rows = execute_select_query(pool, query, user_id=user_id)
+    if not rows:
+        return None
+    return decode_row(rows[0]).get('state')
+
+async def clear_user_state(user_id: int) -> None:
+    await set_user_state(user_id, None)
 
 async def get_user(user_id: int):
     get_user_query = f"""
@@ -85,6 +115,7 @@ async def update_user_nickname(user_id: int, nickname: str):
     """
     execute_update_query(pool, update_user_nickname_query, user_id=user_id, nickname=nickname)
 
+# QUESTIONS
 async def get_question(message: types.Message, user_id: int):
     # Получение текущего вопроса из словаря состояний пользователя
     current_question_index = await get_quiz_index(user_id)
@@ -133,7 +164,7 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
     print(f"Questions: { questions }")
 
     if len(questions) <= current_question_index:
-        print(f"No more questions. Current question index: {current_question_index}, questions count: { len(questions) }")
+        #print(f"No more questions. Current question index: {current_question_index}, questions count: { len(questions) }")
         return False
     
     current_question = questions[current_question_index]
@@ -145,20 +176,25 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
     user_answer_index = int(callback.data)
 
     result_answer = ''
-    options = json.loads(current_question['options'])
+
+    try:
+        options = json.loads(current_question['options'])
+    except json.JSONDecodeError:
+        return MSG_ERROR_OPTIONS
+    
     if user_answer_index == correct_option_index:
         result_answer = generate_correct_answer(options[str(user_answer_index)])
         await add_quiz_results(user_id, 1)
         # Image
-        if current_question['has_answer_image']:
+        if current_question.get('has_answer_image'):
             await callback.bot.send_chat_action(callback.from_user.id, action='upload_photo')
             await callback.message.answer_photo(current_question['answer_image_link'])
         # Video note
-        if  current_question['has_answer_video']:
+        if  current_question.get('has_answer_video'):
             await callback.bot.send_chat_action(callback.from_user.id, action='upload_video')
             await send_video_note(callback.message, current_question['answer_video_link'], current_question['answer_video_duration'], current_question['answer_video_length'])
         # Voice message        
-        if current_question['has_answer_voice']:
+        if current_question.get('has_answer_voice'):
             await callback.bot.send_chat_action(callback.from_user.id, action='upload_voice')
             await callback.message.answer_voice(current_question['answer_voice_link'])
     else:
@@ -172,7 +208,7 @@ async def check_question_answer(callback: types.CallbackQuery, user_id: int):
         await callback.bot.edit_message_text(
             chat_id=callback.from_user.id,
             message_id=callback.message.message_id,
-            text=f'<b>{current_question["question_text"]}</b>\n\n{result_answer}', 
+            text=f'<b>{current_question["order_index"]}. {current_question["question_text"]}</b>\n\n{result_answer}', 
             reply_markup=None,
             parse_mode='HTML'
         )
@@ -223,13 +259,6 @@ async def update_quiz_index(user_id: int, question_index: int):
         question_index=question_index,
     )
 
-def decode_question(row):
-    """Превращает байтовые поля вопроса в обычные строки"""
-    for key, value in row.items():
-        if isinstance(value, bytes):
-            row[key] = value.decode('utf-8')
-    return row    
-
 async def get_questions():
     get_questions_query = f"""
         SELECT *
@@ -245,4 +274,4 @@ async def get_questions():
     if not results:
         return []
     
-    return [decode_question(row) for row in results]
+    return [decode_row(row) for row in results]

@@ -1,5 +1,20 @@
 DB_NAME = 'quiz_bot.db'
 
+# Сообщения для пользователей
+MSG_BUTTON_NOT_ACTIVE = "Эта кнопка больше не активна."
+MSG_NO_QUESTIONS = "Нет вопросов"
+MSG_QUIZ_FINISHED = "Это был последний вопрос. Квиз завершен!"
+MSG_NOT_IN_QUIZ = "Вы не участвуете в викторине. Нажмите /start."
+MSG_ERROR_OPTIONS = "⚠️ Ошибка в данных вопроса."
+
+# Для главного меню и никнейма
+MSG_CHOOSE_ACTION = "На ваш выбор:"
+MSG_CURRENT_NICKNAME = "Текущий никнейм: {nickname}. Если хотите изменить, напишите мне новый никнейм."
+MSG_NICKNAME_UPDATED = "Отлично, {nickname}!"
+MSG_NICKNAME_TOO_LONG = "Слишком длинный ник! Максимум 20 символов."
+MSG_NICKNAME_TOO_SHORT = "Слишком короткий ник! Минимум 3 символа."
+MSG_START_QUIZ = "Начинаем квиз!"
+
 CORRECT_PHRASES = [
     'Отличный ход!',
     'Это было хорошо!',

@@ -1,6 +1,6 @@
 from random import randint
 from aiogram import types
-from data.constatns import CORRECT_PHRASES, UNHANDLED_MESSAGES_PHRASES, WRONG_PHRASES, PRE_WRONG_PHRASE, EMOJI_CORRECT, EMOJI_WRONG
+from data.constants import CORRECT_PHRASES, UNHANDLED_MESSAGES_PHRASES, WRONG_PHRASES, PRE_WRONG_PHRASE, EMOJI_CORRECT, EMOJI_WRONG
 from keyboards import generate_main_menu_keyboard
 
 
@@ -65,4 +65,4 @@ async def generate_top_results_list(results, get_user_nickname):
 
 async def show_main_menu(message: types.Message, nickname: str):
     kb = generate_main_menu_keyboard()
-    await message.answer(f"<b>{ nickname }</b>, На ваш выбор:", parse_mode="HTML", reply_markup=kb)
+    await message.answer(f"<b>{ nickname }</b>, на ваш выбор:", parse_mode="HTML", reply_markup=kb)
