@@ -15,7 +15,7 @@ from states.state import UserForm
 from aiogram import F, Router, types
 from aiogram.exceptions import TelegramBadRequest
 from data.callbacks import CB_CANCEL, CB_RESULTS_MENU, CB_RESULTS_TOP, CB_START_QUIZ
-from data.constants import MSG_BUTTON_NOT_ACTIVE, MSG_QUIZ_NOT_ACTIVE, MSG_NOT_IN_QUIZ
+from data.constants import MSG_BUTTON_NOT_ACTIVE, MSG_NOT_IN_QUIZ
 from handlers.common_functions import check_nickname, main_menu_state
 from service import (
     get_user_state, set_user_state, clear_user_state,
