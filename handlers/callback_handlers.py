@@ -135,7 +135,7 @@ async def change_nickname(callback: types.CallbackQuery):
         await callback.answer(MSG_BUTTON_NOT_ACTIVE, show_alert=True)
         return
     await clear_markup(callback)
-    await change_nickname_state(callback)
+    await change_nickname_state(callback.message, callback.from_user.id)
 
 # Кнопка топа результатов
 @router.callback_query(F.data == CB_RESULTS_TOP)
