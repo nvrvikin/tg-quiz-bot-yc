@@ -1,16 +1,12 @@
 from aiogram import Router, types
-from aiogram.filters import StateFilter
-from aiogram.fsm.context import FSMContext
 
 from data.constants import MSG_CHOOSE_ACTION, MSG_NICKNAME_TOO_LONG, MSG_NICKNAME_TOO_SHORT, MSG_NICKNAME_UPDATED
 from keyboards import generate_main_menu_keyboard
-import states
 from states import state
 
 from .common_functions import main_menu_state
 from service import get_user_state, set_user_state, update_user_nickname
 from generate_answer import generate_unhandled_message_answer
-from states.state import UserForm
 
 # Init text message router
 router = Router()

@@ -1,17 +1,3 @@
-"""
-from aiogram import F, Router, types
-from aiogram.filters import StateFilter
-
-
-from .common_functions import check_nickname, main_menu_state
-from data.callbacks import CB_CANCEL, CB_RESULTS_MENU, CB_RESULTS_TOP, CB_START_QUIZ
-from service import check_question_answer, get_question, get_user, get_top_results, get_user_nickname, new_quiz
-
-
-from keyboards import generate_change_nickname_keyboard, generate_results_menu_keyboard, generate_results_top_keyboard
-
-from states.state import UserForm
-"""
 from aiogram import F, Router, types
 from aiogram.exceptions import TelegramBadRequest
 from data.callbacks import CB_CANCEL, CB_RESULTS_MENU, CB_RESULTS_TOP, CB_START_QUIZ
